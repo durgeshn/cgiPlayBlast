@@ -2,11 +2,13 @@ import tempfile
 from PIL import Image
 from PIL import ImageDraw
 from PIL import ImageFont
+
 reload(ImageDraw)
 
 
 class Slate:
-    def __init__(self, slate=True, band_size=20, font="arial", font_size=10, spacing=0, logo_file=r'D:\temp\slate\logo.jpg'):
+    def __init__(self, slate=True, band_size=20, font="arial", font_size=10, spacing=0,
+                 logo_file=r'D:\temp\slate\logo.jpg'):
         """
         This Class is responsible for adding the slate to an image.
         With the data passed.
@@ -62,16 +64,16 @@ class Slate:
         return slate_info
 
     @staticmethod
-    def validate_slate_data(data):
+    def validate_slate_data(dict_data):
         """
         this looks the data dict for the logo\Frame and checks if any other data is crashing 
         with them in the next line. 
-        :param data: slate data dict
-        :type data: dict
+        :param dict_data: slate data dict
+        :type dict_data: dict
         :return: True or False
         :rtype: bool
         """
-        for key, val in data.iteritems():
+        for key, val in dict_data.iteritems():
             if val == 'logo' or val.startswith('Frame :'):
                 if key in ['1', '2', '3', '7', '8', '9']:
                     if not a['%d' % (int(key) + 3)] == '':
@@ -108,7 +110,7 @@ class Slate:
         :rtype: Imag object
         """
         logo = Image.open(self.comp_logo)
-        logo_w = logo.size[0]
+        # logo_w = logo.size[0]
         logo_h = logo.size[1]
         size = logo.size
         if self.band_size < logo_h:
@@ -144,24 +146,24 @@ class Slate:
         """
         draw = ImageDraw.Draw(in_img)
         length_part = in_img.size[0] / 3
-        space = self.font_size + self.spacing
+        # space = self.font_size + self.spacing
         quad1 = (self.spacing, self.spacing)
         quad2 = (length_part + self.spacing, self.spacing)
         quad3 = ((length_part * 2) + self.spacing, self.spacing)
 
-        quad4 = (self.spacing, (self.spacing+self.font_size))
+        quad4 = (self.spacing, (self.spacing + self.font_size))
         quad5 = (length_part + self.spacing, (self.spacing + self.font_size))
         quad6 = ((length_part * 2) + self.spacing, (self.spacing + self.font_size))
 
-        quad7 = (self.spacing, (in_img.size[1] - 2*(self.spacing + self.font_size)))
-        quad8 = (length_part + self.spacing, (in_img.size[1] - 2*(self.spacing + self.font_size)))
-        quad9 = (2*length_part + self.spacing, (in_img.size[1] - 2*(self.spacing + self.font_size)))
+        quad7 = (self.spacing, (in_img.size[1] - 2 * (self.spacing + self.font_size)))
+        quad8 = (length_part + self.spacing, (in_img.size[1] - 2 * (self.spacing + self.font_size)))
+        quad9 = (2 * length_part + self.spacing, (in_img.size[1] - 2 * (self.spacing + self.font_size)))
 
         quad10 = (self.spacing, (in_img.size[1] - (self.spacing + self.font_size)))
         quad11 = (length_part + self.spacing, (in_img.size[1] - (self.spacing + self.font_size)))
-        quad12 = (2*length_part + self.spacing, (in_img.size[1] - (self.spacing + self.font_size)))
+        quad12 = (2 * length_part + self.spacing, (in_img.size[1] - (self.spacing + self.font_size)))
 
-        if not self.validate_slate_data(data=data_passed):
+        if not self.validate_slate_data(dict_data=data_passed):
             return False
 
         for each_key in data_passed:
