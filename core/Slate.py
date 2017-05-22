@@ -7,6 +7,23 @@ reload(ImageDraw)
 
 class Slate:
     def __init__(self, slate=True, band_size=20, font="arial", font_size=10, spacing=0, logo_file=r'D:\temp\slate\logo.jpg'):
+        """
+        This Class is responsible for adding the slate to an image.
+        With the data passed.
+        With or without the slate bar.
+        :param slate: for the slate bar. 
+        :type slate: bool
+        :param band_size: size for the slate bar 
+        :type band_size: int
+        :param font: font name
+        :type font: str
+        :param font_size: font size 
+        :type font_size: int
+        :param spacing: space between the 2 lines.
+        :type spacing: int
+        :param logo_file: logo if any provided.
+        :type logo_file: str
+        """
         self.temp_folder = tempfile.mkdtemp(prefix='cgiSlateMaker')
         self.comp_logo = logo_file
         self.font_size = font_size
@@ -18,6 +35,13 @@ class Slate:
 
     @staticmethod
     def get_img(ima_path):
+        """
+        make the Image object for the given image.
+        :param ima_path: file path for the image
+        :type ima_path: file path
+        :return: Image object
+        :rtype: Image object
+        """
         return Image.open(ima_path)
 
     def validate_images(self):
@@ -25,6 +49,13 @@ class Slate:
 
     @staticmethod
     def process_slate_data(**kwargs):
+        """
+        process the data as per the dict.
+        :param kwargs: dict. for the slate data
+        :type kwargs: dict
+        :return: dict for slate
+        :rtype: dict
+        """
         slate_info = dict()
         for key, val in kwargs.iteritems():
             slate_info[key] = val
@@ -32,6 +63,14 @@ class Slate:
 
     @staticmethod
     def validate_slate_data(data):
+        """
+        this looks the data dict for the logo\Frame and checks if any other data is crashing 
+        with them in the next line. 
+        :param data: slate data dict
+        :type data: dict
+        :return: True or False
+        :rtype: bool
+        """
         for key, val in data.iteritems():
             if val == 'logo' or val.startswith('Frame :'):
                 if key in ['1', '2', '3', '7', '8', '9']:
@@ -43,6 +82,13 @@ class Slate:
         return True
 
     def stripe_image(self, in_img):
+        """
+        weather to add strip to image or not.
+        :param in_img: image file object
+        :type in_img: Image object
+        :return: image file object
+        :rtype: Image object
+        """
         in_img_size = in_img.size
         if self.is_slate:
             size_x = in_img_size[0]
@@ -54,7 +100,13 @@ class Slate:
             pass
         return in_img
 
-    def add_logo(self, in_img, location=(0, 0)):
+    @property
+    def get_logo(self):
+        """
+        This takes care of the logo part. Re-sizes the logo according to the slate bar.
+        :return: logo img object
+        :rtype: Imag object
+        """
         logo = Image.open(self.comp_logo)
         logo_w = logo.size[0]
         logo_h = logo.size[1]
@@ -64,13 +116,32 @@ class Slate:
             w_size = int((float(logo.size[0]) * float(h_percent)))
             size = (w_size, self.band_size)
         logo = logo.resize(size, Image.ANTIALIAS)
-        in_img.paste(logo, location)
+        return logo
 
     @staticmethod
     def save_image(in_img, out_file):
+        """
+        Save the Image object to the given location.
+        :param in_img: in image object
+        :type in_img: Image object
+        :param out_file: path for the out file
+        :type out_file: filePath
+        :return: path for the out file
+        :rtype: filePath
+        """
         in_img.save(out_file, 'jpeg')
+        return out_file
 
     def process_text(self, in_img, data_passed):
+        """
+        This is where the processing of the images happens.
+        :param in_img: in image object
+        :type in_img: Image object
+        :param data_passed: slate data dict
+        :type data_passed: dict
+        :return: processed image object
+        :rtype: Image object
+        """
         draw = ImageDraw.Draw(in_img)
         length_part = in_img.size[0] / 3
         space = self.font_size + self.spacing
@@ -96,10 +167,19 @@ class Slate:
         for each_key in data_passed:
             quad = 'quad%s' % each_key
             if data_passed[each_key] == 'logo':
-                quad = eval(quad)
-                quad = (quad[0], quad[1]-self.spacing)
-
-                self.add_logo(in_img=in_img, location=quad)
+                quad_pass = eval(quad)
+                pos_y = quad_pass[0]
+                pos_x = quad_pass[1]
+                if each_key in ['1', '2', '3', '4', '5', '6']:
+                    pos_y = 0
+                if each_key in ['7', '8', '9', '10', '11', '12']:
+                    pos_y = in_img[1] - self.get_logo.size[0]
+                if each_key in ['1', '4', '7', '10']:
+                    pos_x = 0
+                if each_key in ['3', '6', '9', '12']:
+                    pos_x = in_img.size[0] - self.get_logo.size[0]
+                quad_pass = (pos_x, pos_y)
+                in_img.paste(self.get_logo, quad_pass)
                 continue
             if data_passed[each_key]:
                 draw.text(eval(quad), data_passed[each_key], (255, 255, 255), font=self.font)
@@ -113,9 +193,9 @@ if __name__ == '__main__':
     sl = Slate(slate=True)
     img = sl.get_img(r'D:\temp\IMGS\img.0001.jpg')
     ret = sl.stripe_image(img)
-    a = {'1': 'User : Durgesh.n', '2': 'FileName : TESTINGSCENE.ma', '3': 'logo',
-         '4': 'Date : 12/12/2017', '5': 'FINAL MOV', '6': '',
-         '7': 'CameraName : CamXXX', '8': 'focalLength : 60', '9': 'Frame : 1',
+    a = {'1': 'User : Durgesh.n', '2': 'FileName : TESTINGSCENE.ma', '3': '',
+         '4': 'Date : 12/12/2017', '5': 'FINAL MOV', '6': 'logo',
+         '7': 'CameraName : CamXXX', '8': 'focalLength : 60', '9': '',
          '10': '', '11': '', '12': '',
          }
     data = sl.process_slate_data(**a)
