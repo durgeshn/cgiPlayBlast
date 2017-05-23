@@ -163,7 +163,7 @@ class Slate:
         quad11 = (length_part + self.spacing, (in_img.size[1] - (self.spacing + self.font_size)))
         quad12 = (2 * length_part + self.spacing, (in_img.size[1] - (self.spacing + self.font_size)))
 
-        print quad1, quad2, quad3, quad4, quad5, quad6, quad7 ,quad8 ,quad9, quad10, quad11, quad12
+        print quad1, quad2, quad3, quad4, quad5, quad6, quad7, quad8, quad9, quad10, quad11, quad12
 
         if not self.validate_slate_data(dict_data=data_passed):
             return False
